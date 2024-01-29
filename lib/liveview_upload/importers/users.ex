@@ -25,7 +25,7 @@ defmodule LU.Importers.Users do
   end
 
   def import_row(import_id, row) do
-    row_id = LU.random_string()
+    row_id = Flamel.Random.string()
 
     Context.assign(%Context{}, %{import_id: import_id, row: row, row_id: row_id})
     |> start_import()
@@ -97,7 +97,7 @@ defmodule LU.Importers.Users do
          %{halt?: false, assigns: %{row_id: row_id, user: user, import_id: import_id}} = context
        ) do
     Flamel.Task.background(fn ->
-      case Users.update_user(user, %{platform_id: LU.random_string()}) do
+      case Users.update_user(user, %{platform_id: Flamel.Random.string()}) do
         {:ok, user} ->
           :timer.sleep(random_sleep(1000, 5000))
           Context.assign(context, :user, user)
