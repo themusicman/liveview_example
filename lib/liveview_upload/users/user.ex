@@ -9,13 +9,15 @@ defmodule LU.Users.User do
 
     field :platform_id, :string
 
+    belongs_to(:team, LU.Teams.Team)
+
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :import_status, :platform_id])
+    |> cast(attrs, [:name, :import_status, :platform_id, :team_id])
     |> validate_required([:name])
   end
 end

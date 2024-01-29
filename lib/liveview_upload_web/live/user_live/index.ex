@@ -3,15 +3,21 @@ defmodule LUWeb.UserLive.Index do
 
   alias LU.Users
   alias LU.Users.User
+  import Flamel.Wrap, only: [noreply: 1, ok: 1]
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :users, Users.list_users())}
+    socket
+    |> assign(:teams, LU.Teams.list_teams())
+    |> stream(:users, Users.list_users())
+    |> ok()
   end
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    socket
+    |> apply_action(socket.assigns.live_action, params)
+    |> noreply()
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -34,7 +40,9 @@ defmodule LUWeb.UserLive.Index do
 
   @impl true
   def handle_info({LUWeb.UserLive.FormComponent, {:saved, user}}, socket) do
-    {:noreply, stream_insert(socket, :users, user)}
+    socket
+    |> stream_insert(:users, user)
+    |> noreply()
   end
 
   @impl true
@@ -42,6 +50,18 @@ defmodule LUWeb.UserLive.Index do
     user = Users.get_user!(id)
     {:ok, _} = Users.delete_user(user)
 
-    {:noreply, stream_delete(socket, :users, user)}
+    socket
+    |> stream_delete(:users, user)
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("delete-all", _params, socket) do
+    LU.Users.list_users() |> Enum.each(fn u -> LU.Users.delete_user(u) end)
+
+    socket
+    |> stream(:users, [], reset: true)
+    |> put_flash(:info, "Purged users!")
+    |> noreply()
   end
 end

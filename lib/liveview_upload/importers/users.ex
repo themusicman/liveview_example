@@ -3,7 +3,6 @@ defmodule LU.Importers.Users do
   alias Phoenix.PubSub
   alias NimbleCSV.RFC4180, as: NimbleCSV
   alias LU.Importers.Error
-  import Flamel.Wrap
   alias Flamel.Context
 
   def import(import_id, dest) do

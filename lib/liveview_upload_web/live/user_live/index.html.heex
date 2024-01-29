@@ -7,12 +7,17 @@
   </:actions>
 </.header>
 
+<.button phx-click="delete-all">Purge Users</.button>
+
 <.table
   id="users"
   rows={@streams.users}
   row_click={fn {_id, user} -> JS.navigate(~p"/users/#{user}") end}
 >
   <:col :let={{_id, user}} label="Name"><%= user.name %></:col>
+  <:col :let={{_id, user}} label="Team">
+    <%= if user.team, do: user.team.name, else: "n/a" %>
+  </:col>
   <:action :let={{_id, user}}>
     <div class="sr-only">
       <.link navigate={~p"/users/#{user}"}>Show</.link>
@@ -36,6 +41,7 @@
     title={@page_title}
     action={@live_action}
     user={@user}
+    teams={@teams}
     patch={~p"/users"}
   />
 </.modal>

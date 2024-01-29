@@ -25,6 +25,13 @@ defmodule LUWeb.Router do
     live "/users/:id", UserLive.Show, :show
     live "/users/:id/show/edit", UserLive.Show, :edit
 
+    live "/teams", TeamLive.Index, :index
+    live "/teams/new", TeamLive.Index, :new
+    live "/teams/:id/edit", TeamLive.Index, :edit
+
+    live "/teams/:id", TeamLive.Show, :show
+    live "/teams/:id/show/edit", TeamLive.Show, :edit
+
     live "/import", UploadLive, :index
   end
 

@@ -18,7 +18,8 @@ defmodule LU.Users do
 
   """
   def list_users do
-    Repo.all(User)
+    from(u in User, preload: [:team])
+    |> Repo.all()
   end
 
   @doc """

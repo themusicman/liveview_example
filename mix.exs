@@ -53,7 +53,8 @@ defmodule LU.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:csv, "~> 3.2"},
       {:nimble_csv, "~> 1.2"},
-      {:flamel, github: "themusicman/flamel", branch: "main"}
+      {:flamel, github: "themusicman/flamel", branch: "main"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
