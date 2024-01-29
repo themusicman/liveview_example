@@ -4,7 +4,9 @@ defmodule LU.Users.User do
 
   schema "users" do
     field :name, :string
-    field :imported, :boolean, default: false
+
+    field(:import_status, Ecto.Enum, values: [:started, :awaiting_platform_id, :finished])
+
     field :platform_id, :string
 
     timestamps(type: :utc_datetime)
@@ -13,7 +15,7 @@ defmodule LU.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :imported, :platform_id])
+    |> cast(attrs, [:name, :import_status, :platform_id])
     |> validate_required([:name])
   end
 end

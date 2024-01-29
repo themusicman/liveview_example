@@ -3,7 +3,7 @@ defmodule LU.Repo.Migrations.AddFieldsToUser do
 
   def change do
     alter table(:users) do
-      add :imported, :boolean
+      add :import_status, :string
       add :platform_id, :string
     end
   end

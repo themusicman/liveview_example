@@ -2,13 +2,27 @@
   <.live_file_input upload={@uploads.import} />
   <button type="submit">Upload</button>
 </form>
+<br />
 
-<table>
+<div :if={@import_finished}>
+  <p class="text-lime-300 text-2xl">Import finished!</p>
+  <br />
+</div>
+
+<table class="table-auto w-full text-left">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Status</th>
+      <th>Platform ID</th>
+    </tr>
+  </thead>
   <tbody id="users" phx-update="stream">
     <tr :for={{dom_id, user} <- @streams.users} id={dom_id}>
-      <td>User Imported:</td>
+      <td>User:</td>
       <td><%= user.name %></td>
-      <td><%= user.imported %></td>
+      <td><%= user.import_status %></td>
       <td><%= user.platform_id %></td>
     </tr>
   </tbody>

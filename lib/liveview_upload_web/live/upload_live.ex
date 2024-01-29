@@ -12,26 +12,29 @@ defmodule LUWeb.UploadLive do
      socket
      |> assign(:uploaded_files, [])
      |> assign(:import_id, nil)
+     |> assign(:import_finished, false)
      |> stream(:users, [])
      |> stream(:errors, [])
      |> allow_upload(:import, accept: ~w(.csv), max_entries: 1)}
   end
 
   @impl true
-  def handle_info({:user_imported, import_id, user}, socket) do
+  def handle_info({:user_import_update, import_id, user}, socket) do
     if socket.assigns.import_id == import_id do
       socket
-      |> stream_insert(:users, user)
+      |> stream_insert(:users, user, at: 0)
       |> Flamel.Wrap.noreply()
     else
       Flamel.Wrap.noreply(socket)
     end
   end
 
-  def handle_info({:user_platform_imported, import_id, user}, socket) do
+  def handle_info({:user_import_finished, import_id}, socket) do
     if socket.assigns.import_id == import_id do
       socket
-      |> stream_insert(:users, user)
+      |> assign(:import_finished, true)
+      |> stream(:users, [])
+      |> stream(:errors, [])
       |> Flamel.Wrap.noreply()
     else
       Flamel.Wrap.noreply(socket)
