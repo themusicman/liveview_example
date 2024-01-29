@@ -2,6 +2,7 @@ defmodule LUWeb.UserLive.FormComponent do
   use LUWeb, :live_component
 
   alias LU.Users
+  alias LU.Repo
 
   @impl true
   def render(assigns) do
@@ -20,6 +21,13 @@ defmodule LUWeb.UserLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Name" />
+        <.input
+          prompt="Pick a team"
+          field={@form[:team_id]}
+          type="select"
+          options={select_options(@teams, :name)}
+          label="Team"
+        />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>
@@ -70,6 +78,7 @@ defmodule LUWeb.UserLive.FormComponent do
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
       {:ok, user} ->
+        user = Repo.preload(user, :team)
         notify_parent({:saved, user})
 
         {:noreply,

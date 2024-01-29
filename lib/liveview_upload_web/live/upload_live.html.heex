@@ -1,51 +1,77 @@
 <form id="upload-form" phx-submit="save" phx-change="validate">
-  <.live_file_input upload={@uploads.import} />
-  <button type="submit">Upload</button>
-</form>
+  <div class="mt-10 space-y-8 bg-white">
+    <!-- <LUWeb.CoreComponents.input> lib/liveview_upload_web/components/core_components.ex:370 -->
+    <div
+      data-phx-id="phx-F67VqLpq6QJEQx0D-20"
+      phx-feedback-for="team[name]"
+      class="phx-no-feedback"
+    >
+      <!-- <LUWeb.CoreComponents.label> lib/liveview_upload_web/components/core_components.ex:398 -->
+      <label for="team_name" class="block text-sm font-semibold leading-6 text-zinc-800">
+        File
+      </label>
+      <.live_file_input
+        class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400"
+        upload={@uploads.import}
+      />
+      <section phx-drop-target={@uploads.import.ref}>
+        <%!-- render each import entry --%>
+        <%= for entry <- @uploads.import.entries do %>
+          <article class="upload-entry">
+            <figure>
+              <figcaption><%= entry.client_name %></figcaption>
+            </figure>
 
-<table>
-  <tbody id="users" phx-update="stream">
-    <tr :for={{dom_id, user} <- @streams.users} id={dom_id}>
-      <td>User Imported:</td>
-      <td><%= user.name %></td>
-      <td><%= user.imported %></td>
-      <td><%= user.platform_id %></td>
-    </tr>
-  </tbody>
-</table>
+            <%!-- entry.progress will update automatically for in-flight entries --%>
+            <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
 
-<%!-- use phx-drop-target with the upload ref to enable file drag and drop --%>
-<section phx-drop-target={@uploads.import.ref}>
-  <%!-- render each import entry --%>
-  <%= for entry <- @uploads.import.entries do %>
-    <article class="upload-entry">
-      <figure>
-        <.live_img_preview entry={entry} />
-        <figcaption><%= entry.client_name %></figcaption>
-      </figure>
+            <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+            <button
+              type="button"
+              phx-click="cancel-upload"
+              phx-value-ref={entry.ref}
+              aria-label="cancel"
+            >
+              &times;
+            </button>
 
-      <%!-- entry.progress will update automatically for in-flight entries --%>
-      <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+            <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
+            <%= for err <- upload_errors(@uploads.import, entry) do %>
+              <p class="alert alert-danger"><%= error_to_string(err) %></p>
+            <% end %>
+          </article>
+        <% end %>
 
-      <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+        <%!-- Phoenix.Component.upload_errors/1 returns a list of error atoms --%>
+        <%= for err <- upload_errors(@uploads.import) do %>
+          <p class="alert alert-danger"><%= error_to_string(err) %></p>
+        <% end %>
+      </section>
+    </div>
+    <!-- </LUWeb.CoreComponents.input> -->
+    <div class="mt-2 flex items-center justify-between gap-6">
+      <!-- <LUWeb.CoreComponents.button> lib/liveview_upload_web/components/core_components.ex:229 -->
       <button
-        type="button"
-        phx-click="cancel-upload"
-        phx-value-ref={entry.ref}
-        aria-label="cancel"
+        :if={Enum.count(@uploads.import.entries) > 0}
+        class="phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3 text-sm font-semibold leading-6 text-white active:text-white/80 "
+        phx-disable-with="Saving..."
       >
-        &times;
+        Upload
       </button>
+      <!-- </LUWeb.CoreComponents.button> -->
+    </div>
+  </div>
+</form>
+<br />
 
-      <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
-      <%= for err <- upload_errors(@uploads.import, entry) do %>
-        <p class="alert alert-danger"><%= error_to_string(err) %></p>
-      <% end %>
-    </article>
-  <% end %>
-
-  <%!-- Phoenix.Component.upload_errors/1 returns a list of error atoms --%>
-  <%= for err <- upload_errors(@uploads.import) do %>
-    <p class="alert alert-danger"><%= error_to_string(err) %></p>
-  <% end %>
-</section>
+<div :if={@import_finished}>
+  <p class="text-lime-300 text-2xl">Import finished!</p>
+  <br />
+</div>
+<div :if={@import_started}>
+  <.table id="users" rows={@streams.users}>
+    <:col :let={{_id, user}} label="Name"><%= user.name %></:col>
+    <:col :let={{_id, user}} label="Status"><%= user.import_status %></:col>
+    <:col :let={{_id, user}} label="Platform ID"><%= user.platform_id %></:col>
+  </.table>
+</div>

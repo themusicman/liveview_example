@@ -90,6 +90,8 @@ defmodule LUWeb do
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
+      import LUWeb.LiveviewHelpers
+
       # Routes generation with the ~p sigil
       unquote(verified_routes())
     end
