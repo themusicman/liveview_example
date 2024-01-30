@@ -35,8 +35,6 @@ defmodule LUWeb.UploadLive do
     if socket.assigns.import_id == import_id do
       socket
       |> assign(:import_finished, true)
-      |> stream(:users, [])
-      |> stream(:errors, [])
       |> noreply()
     else
       noreply(socket)
@@ -76,11 +74,8 @@ defmodule LUWeb.UploadLive do
 
         File.cp!(path, dest)
 
-        Flamel.Task.background(fn ->
-          # simulate some waiting
-          :timer.sleep(500)
-          LU.Importers.Users.import(import_id, dest)
-        end)
+        # Start GenServer to handle import
+        LU.Importers.Users.factory(import_id, %{destination: dest})
 
         {:ok, ~p"/uploads/#{Path.basename(dest)}"}
       end)
@@ -88,7 +83,10 @@ defmodule LUWeb.UploadLive do
     socket
     |> update(:uploaded_files, &(&1 ++ uploaded_files))
     |> assign(:import_id, import_id)
+    |> stream(:users, [], reset: true)
+    |> stream(:errors, [], reset: true)
     |> assign(:import_started, true)
+    |> assign(:import_finished, false)
     |> noreply()
   end
 

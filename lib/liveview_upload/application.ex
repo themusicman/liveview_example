@@ -12,9 +12,12 @@ defmodule LU.Application do
       LU.Repo,
       {DNSCluster, query: Application.get_env(:liveview_upload, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LU.PubSub},
+      {DynamicSupervisor, strategy: :one_for_one, name: LU.DynamicSupervisor},
+      {Registry, keys: :unique, name: LU.Registry},
       # Start the Finch HTTP client for sending emails
       {Finch, name: LU.Finch},
       {Task.Supervisor, name: Flamel.Task},
+      {Task.Supervisor, name: LU.TaskSupervisor},
       # Start a worker by calling: LU.Worker.start_link(arg)
       # {LU.Worker, arg},
       # Start to serve requests, typically the last entry
