@@ -1,13 +1,16 @@
 defmodule LU.Users.User do
+  @moduledoc """
+  A schema that represents a user in the application
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "users" do
-    field :name, :string
+    field(:name, :string)
 
     field(:import_status, Ecto.Enum, values: [:started, :awaiting_platform_id, :finished])
 
-    field :platform_id, :string
+    field(:platform_id, :string)
 
     belongs_to(:team, LU.Teams.Team)
 

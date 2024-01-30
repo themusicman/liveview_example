@@ -1,9 +1,12 @@
 defmodule LU.Teams.Team do
+  @moduledoc """
+  A schema that represents a group of users in the application
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "teams" do
-    field :name, :string
+    field(:name, :string)
 
     timestamps(type: :utc_datetime)
   end
